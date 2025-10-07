@@ -1,121 +1,253 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CodeQuick - توليد الباركود</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 400px;
-      margin: 20px auto;
-      background-color: #f5f5f7;
-      color: #333;
-      text-align: center;
-    }
-    h1 {
-      color: #4a5568;
-    }
-    textarea {
-      width: 100%;
-      height: 80px;
-      margin-top: 8px;
-      font-size: 16px;
-      padding: 8px;
-      resize: vertical;
-    }
-    select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 12px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    #qrcode {
-      margin: 20px auto;
-      background:#fff;
-      padding: 15px;
-      display: inline-block;
-    }
-    .download-btn {
-      background-color: #2b6cb0;
-      border: none;
-      color: white;
-      margin-top: 12px;
-      border-radius: 6px;
-      font-weight: bold;
-    }
-    .download-btn:hover {
-      background-color: #2c5282;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CodeQuick - توليد الباركود</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9fafb;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+  }
+  .container {
+    max-width: 420px;
+    background: white;
+    margin: 20px;
+    padding: 30px 25px 50px 25px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    text-align: right;
+  }
+  h1 {
+    color: #2d3748;
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+  p.subtitle {
+    color: #718096;
+    font-size: 14px;
+    margin-bottom: 25px;
+  }
+  label {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 6px;
+    display: block;
+  }
+  textarea {
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    resize: none;
+    width: 100%;
+    min-height: 90px;
+    padding: 10px;
+    font-size: 16px;
+    color: #2d3748;
+    font-family: inherit;
+    transition: border-color 0.3s;
+  }
+  textarea:focus {
+    outline: none;
+    border-color: #3182ce;
+  }
+  select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    color: #2d3748;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.3s;
+    background: white;
+  }
+  select:focus {
+    outline: none;
+    border-color: #3182ce;
+  }
+  button#generate {
+    background-color: #3182ce;
+    border: none;
+    margin-top: 20px;
+    cursor: pointer;
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    padding: 14px;
+    width: 100%;
+    border-radius: 10px;
+    transition: background-color 0.3s;
+  }
+  button#generate:hover {
+    background-color: #2c5282;
+  }
+  #preview {
+    margin-top: 30px;
+    text-align: center;
+    color: #718096;
+  }
+  #barcode, #qrcode {
+    margin: 10px auto;
+    background: white;
+    padding: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    display: inline-block;
+  }
+  button.download-btn {
+    margin-top: 12px;
+    padding: 12px 30px;
+    background-color: #3182ce;
+    border: none;
+    color: white;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    display: none;
+    transition: background-color 0.3s;
+  }
+  button.download-btn:hover {
+    background-color: #2c5282;
+  }
+  footer {
+    margin-top: 40px;
+    font-size: 14px;
+    color: #a0aec0;
+    text-align: center;
+  }
+</style>
 </head>
 <body>
 
+<div class="container">
   <h1>CodeQuick</h1>
-  <p>Instantly generate, customize, and download barcodes.</p>
+  <p class="subtitle">Instantly generate, customize, and download barcodes.</p>
 
   <label for="data">Barcode Details</label>
-  <textarea id="data" placeholder="اكتب هنا بياناتك أو رابط"></textarea>
+  <textarea id="data" placeholder="اكتب هنا بياناتك أو رابط (مثال: https://example.com أو 1234567890)"></textarea>
 
   <label for="type">Barcode Type</label>
-  <select id="type" disabled>
-    <option value="qrcode" selected>QR Code</option>
-    <!-- يمكن إضافة أنواع أخرى مستقبلا -->
+  <select id="type">
+    <option value="qrcode">QR Code</option>
+    <option value="code128">Code 128</option>
+    <option value="itf14">ITF-14</option>
+    <option value="code39">Code 39</option>
   </select>
 
   <button id="generate">Generate Barcode</button>
 
   <div id="preview">
     <h3>Preview</h3>
-    <div id="qrcode">Barcode will be displayed here</div>
+    <div id="qrcode" style="display:none;"></div>
+    <svg id="barcode" style="display:none;"></svg>
   </div>
 
-  <button id="download" class="download-btn" style="display:none;">Download PNG</button>
+  <button id="download" class="download-btn">Download PNG</button>
 
-  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-  <script>
-    const generateBtn = document.getElementById('generate');
-    const qrcodeContainer = document.getElementById('qrcode');
-    const dataInput = document.getElementById('data');
-    const downloadBtn = document.getElementById('download');
-    let qr;
+  <footer>© 2025 CodeQuick. All rights reserved.</footer>
+</div>
 
-    generateBtn.addEventListener('click', () => {
-      const data = dataInput.value.trim();
-      if (!data) {
-        alert('يرجى إدخال بيانات لإنشاء الباركود');
-        return;
-      }
-      // إزالة الباركود القديم
-      qrcodeContainer.innerHTML = '';
-      // توليد QR Code جديد
-      qr = new QRCode(qrcodeContainer, {
+<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<script>
+  const dataInput = document.getElementById('data');
+  const typeSelect = document.getElementById('type');
+  const generateBtn = document.getElementById('generate');
+  const qrDiv = document.getElementById('qrcode');
+  const barcodeSvg = document.getElementById('barcode');
+  const downloadBtn = document.getElementById('download');
+
+  let qrInstance = null;
+
+  generateBtn.addEventListener('click', () => {
+    const data = dataInput.value.trim();
+    const type = typeSelect.value;
+
+    if (!data) {
+      alert('يرجى إدخال بيانات لإنشاء الباركود');
+      return;
+    }
+
+    // إخفاء وتحضير أماكن العرض
+    qrDiv.style.display = 'none';
+    qrDiv.innerHTML = '';
+    barcodeSvg.style.display = 'none';
+    downloadBtn.style.display = 'none';
+
+    if (type === 'qrcode') {
+      // توليد QR Code
+      qrDiv.style.display = 'block';
+      qrInstance = new QRCode(qrDiv, {
         text: data,
         width: 200,
         height: 200,
-        colorDark : "#000000",
-        colorLight : "#ffffff",
+        colorDark : "#2d3748",
+        colorLight : "#fff",
+        correctLevel : QRCode.CorrectLevel.H
       });
       downloadBtn.style.display = 'inline-block';
-    });
+    } else {
+      // توليد باقي أنواع الباركود عن طريق JsBarcode
+      barcodeSvg.style.display = 'block';
+      JsBarcode(barcodeSvg, data, {
+        format: type,
+        lineColor: "#2d3748",
+        width: 2,
+        height: 80,
+        displayValue: true,
+        fontSize: 15,
+        margin: 10,
+        background: "#fff",
+      });
+      downloadBtn.style.display = 'inline-block';
+    }
+  });
 
-    downloadBtn.addEventListener('click', () => {
-      if (!qr) return;
-      // الحصول على الكانفس من QRCode
-      let canvas = qrcodeContainer.querySelector('canvas');
+  downloadBtn.addEventListener('click', () => {
+    const type = typeSelect.value;
+    if (type === 'qrcode') {
+      let canvas = qrDiv.querySelector('canvas');
       if (!canvas) return alert('الباركود لم يتم توليده بعد');
-      // تحويل الكانفس إلى رابط تحميل
       let image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-      // إنشاء رابط مؤقت وتحميل الصورة
       let link = document.createElement('a');
       link.href = image;
       link.download = 'barcode.png';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    });
-  </script>
 
+    } else {
+      // لتحويل SVG إلى PNG وتحميل
+      let svg = barcodeSvg.outerHTML;
+      let canvas = document.createElement("canvas");
+      let ctx = canvas.getContext("2d");
+      let img = new Image();
+      let svgBlob = new Blob([svg], {type:"image/svg+xml;charset=utf-8"});
+      let url = URL.createObjectURL(svgBlob);
+
+      img.onload = function() {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.fillStyle = "#FFF";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+        let imgURI = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        let link = document.createElement('a');
+        link.href = imgURI;
+        link.download = 'barcode.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+      img.src = url;
+    }
+  });
+</script>
 </body>
 </html>
